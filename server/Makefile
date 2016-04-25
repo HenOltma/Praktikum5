@@ -1,0 +1,19 @@
+EXE = rls_one_way_session_server
+MAIN = rls_one_way_svc
+RPCGEN = rpcgen
+
+EXE: $(EXE)
+	
+rls_one_way_svc.c rls_one_way_xdr.c rls_one_way.h: ../rls_one_way.x
+	cp ../rls_one_way.x .
+	$(RPCGEN) rls_one_way.x
+	$(RM) $(MAIN).c
+	$(RPCGEN) -s tcp -o $(MAIN).c rls_one_way.x
+	$(RM) rls_one_way_clnt.c
+
+$(EXE): $(MAIN).c rls_one_way_svc_proc.c rls_one_way_xdr.c rls_one_way.h
+	gcc -o $(EXE) rls_one_way_xdr.c rls_one_way_svc_proc.c $(MAIN).c
+
+clean:
+	$(RM) $(EXE) $(MAIN).c rls_one_way_xdr.c \
+	rls_one_way.h rls_one_way.x *.o *.*% 
