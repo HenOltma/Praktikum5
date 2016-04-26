@@ -1,4 +1,4 @@
-EXE = dir
+EXE = checkip
 MAIN = ipcheck_one_way_dir_client
 RPCGEN = rpcgen
 
@@ -22,4 +22,4 @@ $(EXE): ipcheck_one_way_xdr.o ipcheck_one_way_clnt.o $(MAIN).c
 
 clean:
 	$(RM) $(EXE) ipcheck_one_way_xdr.c ipcheck_one_way_clnt.c \
-	ipcheck_one_way.h ipcheck_one_way.x *.o *.*% 
+	ipcheck_one_way.h ipcheck_one_way.x *.o *.*%

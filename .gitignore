@@ -1,1 +1,14 @@
+# Alle temporären Dateien
 *~
+
+# Alle generierten Dateien (leider auch die header)
+*.o
+*_xdr.c
+*_svc.c
+*_clnt.c
+*.h
+
+# Alle binären Dateien die wir erzeugen
+checkip
+checkipresults
+ipcheck_one_way_session_server
