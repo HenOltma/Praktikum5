@@ -9,8 +9,9 @@
 *.h
 
 # Alle kopierten .x dateien in den jeweiligen Unterordnern
-
-**/*.x
+server/*.x
+client_result/*.x
+client_request/*.x
 
 # Alle binären Dateien die wir erzeugen
 checkip

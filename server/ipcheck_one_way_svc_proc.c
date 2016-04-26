@@ -1,8 +1,8 @@
-/**************************************************************  
- * ipcheck_one_way_svc_proc.c	
+/**************************************************************
+ * ipcheck_one_way_svc_proc.c
  * Implementierung der Funktionen zum Auslesen von Directories.
- * Die erste Funktion (dirname_1_svc) kann asynchnron aufgerufen werden. 
- * Die zweite Funktion (readdir_1_svc) kann nur synchron aufgerufen werden. 
+ * Die erste Funktion (dirname_1_svc) kann asynchnron aufgerufen werden.
+ * Die zweite Funktion (readdir_1_svc) kann nur synchron aufgerufen werden.
  * Heinz-Josef Eikerling, HS OS
  * 16.06.2012: Fertigstellung
  * 01.05.2014: Korrektur beim Zurücksetzen der Ergebnisliste.
@@ -23,7 +23,7 @@ extern int errno;
 typedef struct resnode* readdir_reslist;
 struct resnode {
 	char* requesting_clnt_addr;
-        readdir_res* check_res;
+    readdir_res* check_res;
 	readdir_reslist pNext;
 };
 typedef struct resnode resnode;
@@ -44,7 +44,7 @@ static char* reset_client_addr = NULL;
 void reset_result_list(char* req_clnt_addr) {
     if (req_clnt_addr == NULL)
         return;
-    
+
     resnode* cursor = reslist;
     resnode* pcursor = NULL;
     while (cursor != NULL) {
@@ -81,7 +81,7 @@ readdir_res* find_result_for_client (char* req_clnt_addr) {
         cursor = cursor->pNext;
     }
     printf("No matching entry found for %s\n", req_clnt_addr);
-    return NULL;    
+    return NULL;
 }
 
 /*
@@ -99,8 +99,7 @@ void enter_result_for_client(readdir_res* res, char* req_clnt_addr) {
     return;
 }
 
-void*
-dirname_1_svc(nametype *dirname, struct svc_req *request) {
+void* dirname_1_svc(nametype *dirname, struct svc_req *request) {
     namelist nl;
     namelist *nlp;
     DIR *dirp;
@@ -110,11 +109,11 @@ dirname_1_svc(nametype *dirname, struct svc_req *request) {
      * Ggf. Ergebnisse von letztem Client zurueck setzen.
      */
     reset_result_list (reset_client_addr);
-    
-    /* Adresse des anfragenden Clients bestimmen */  
+
+    /* Adresse des anfragenden Clients bestimmen */
     char* req_addr = inet_ntoa(request->rq_xprt->xp_raddr.sin_addr);
     readdir_res* res = find_result_for_client (req_addr);
-    
+
     if (res == NULL) {
         /* neue Liste anlegen */
         res = (readdir_res*) malloc (sizeof(readdir_res));
@@ -122,7 +121,7 @@ dirname_1_svc(nametype *dirname, struct svc_req *request) {
         res->readdir_res_u.list = NULL;
         enter_result_for_client (res, req_addr);
     }
-    
+
     /* Verzeichnis zum Auslesen oeffnen.  */
     dirp = opendir(*dirname);
     if (dirp == NULL) {
@@ -134,14 +133,14 @@ dirname_1_svc(nametype *dirname, struct svc_req *request) {
     char cbuffer [256];
     sprintf(cbuffer, "************* %s *************", *dirname);
     printf("%s\n", cbuffer);
-    
+
     /* An das Ende Result-Liste gehen. */
     nlp = &(res->readdir_res_u.list);
     while ((nl = *nlp) != NULL)
         nlp = &(nl->pNext);
 
     nl = (namenode *) malloc(sizeof (namenode));
-    *nlp = nl; 
+    *nlp = nl;
     nl->name = strdup(cbuffer);
     nlp = &(nl->pNext);
 
@@ -159,8 +158,7 @@ dirname_1_svc(nametype *dirname, struct svc_req *request) {
     return (NULL);
 }
 
-readdir_res*
-readdir_1_svc(void * dummy, struct svc_req *request) {
+readdir_res* readdir_1_svc(void * dummy, struct svc_req *request) {
     /* Adresse des anfragenden Clients bestimmen */
     char* req_addr = inet_ntoa(request->rq_xprt->xp_raddr.sin_addr);
 
@@ -169,9 +167,9 @@ readdir_1_svc(void * dummy, struct svc_req *request) {
 
     /* Ergebnis suchen */
     readdir_res* res = find_result_for_client(req_addr);
-    
+
     if (res == NULL) {
-        res = &DefaultResult; 
+        res = &DefaultResult;
     }
     else {
         /* Ergebnisse gelesen -> fuer Loeschung vorsehen */
