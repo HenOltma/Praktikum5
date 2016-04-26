@@ -1,5 +1,5 @@
 /**************************************************************  
- * rls_one_way_dir_client.c	
+ * ipcheck_one_way_dir_client.c	
  * Client ruft RLS Server asynchron auf. 
  * Heinz-Josef Eikerling, HS OS
  * 14.06.2012: Fertigstellung
@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <rpc/rpc.h>
 #include <errno.h>
-#include "rls_one_way.h"
+#include "ipcheck_one_way.h"
 
 extern int errno;
 struct timeval TIMEOUT = {0, 0}; /* used by one_way_clnt.c with clnt_call() timeouts */

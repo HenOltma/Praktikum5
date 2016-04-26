@@ -1,5 +1,5 @@
 /**************************************************************  
- * rls_one_way_svc_proc.c	
+ * ipcheck_one_way_svc_proc.c	
  * Implementierung der Funktionen zum Auslesen von Directories.
  * Die erste Funktion (dirname_1_svc) kann asynchnron aufgerufen werden. 
  * Die zweite Funktion (readdir_1_svc) kann nur synchron aufgerufen werden. 
@@ -15,7 +15,7 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "rls_one_way.h"
+#include "ipcheck_one_way.h"
 
 extern int errno;
 

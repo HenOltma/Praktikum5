@@ -1,25 +1,25 @@
 EXE = dir
-MAIN = rls_one_way_dir_client
+MAIN = ipcheck_one_way_dir_client
 RPCGEN = rpcgen
 
 EXE: $(EXE)
 
-rls_one_way_xdr.c rls_one_way_clnt.c rls_one_way.h: ../rls_one_way.x
-	cp ../rls_one_way.x .
-	$(RPCGEN) rls_one_way.x
-	$(RM) rls_one_way_svc.c
+ipcheck_one_way_xdr.c ipcheck_one_way_clnt.c ipcheck_one_way.h: ../ipcheck_one_way.x
+	cp ../ipcheck_one_way.x .
+	$(RPCGEN) ipcheck_one_way.x
+	$(RM) ipcheck_one_way_svc.c
 	sed 's/static struct timeval TIMEOUT = { 25, 0 }/extern struct timeval TIMEOUT/' \
-	< rls_one_way_clnt.c > /tmp/$$; mv /tmp/$$ rls_one_way_clnt.c
+	< ipcheck_one_way_clnt.c > /tmp/$$; mv /tmp/$$ ipcheck_one_way_clnt.c
 
-rls_one_way_xdr.o: rls_one_way_xdr.c rls_one_way.h
-	gcc -c rls_one_way_xdr.c
+ipcheck_one_way_xdr.o: ipcheck_one_way_xdr.c ipcheck_one_way.h
+	gcc -c ipcheck_one_way_xdr.c
 
-rls_one_way_clnt.o: rls_one_way_clnt.c rls_one_way.h
-	gcc -c rls_one_way_clnt.c
+ipcheck_one_way_clnt.o: ipcheck_one_way_clnt.c ipcheck_one_way.h
+	gcc -c ipcheck_one_way_clnt.c
 
-$(EXE): rls_one_way_xdr.o rls_one_way_clnt.o $(MAIN).c
-	gcc -o $(EXE) rls_one_way_xdr.o rls_one_way_clnt.o $(MAIN).c
+$(EXE): ipcheck_one_way_xdr.o ipcheck_one_way_clnt.o $(MAIN).c
+	gcc -o $(EXE) ipcheck_one_way_xdr.o ipcheck_one_way_clnt.o $(MAIN).c
 
 clean:
-	$(RM) $(EXE) rls_one_way_xdr.c rls_one_way_clnt.c \
-	rls_one_way.h rls_one_way.x *.o *.*% 
+	$(RM) $(EXE) ipcheck_one_way_xdr.c ipcheck_one_way_clnt.c \
+	ipcheck_one_way.h ipcheck_one_way.x *.o *.*% 
