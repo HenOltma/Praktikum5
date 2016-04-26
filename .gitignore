@@ -8,6 +8,10 @@
 *_clnt.c
 *.h
 
+# Alle kopierten .x dateien in den jeweiligen Unterordnern
+
+**/*.x
+
 # Alle binären Dateien die wir erzeugen
 checkip
 checkipresults
