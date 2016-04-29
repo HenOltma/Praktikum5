@@ -20,9 +20,8 @@ int main(int argc, char** argv)
 {
     CLIENT *cl;
     char *server;
-    char *dir;
-    readdir_res *result;
-    namelist nl;
+    checkIP_res *result;
+    resultlist nl;
     int i;
 
     if (argc != 2) {
@@ -34,7 +33,7 @@ int main(int argc, char** argv)
     /* 
      * Erzeugung eines Client Handles.
      */
-    if ((cl = clnt_create(server, DIRPROG, DIRVERS, "tcp")) == NULL) {
+    if ((cl = clnt_create(server, CHECK_IP, CHECK_IP_1, "tcp")) == NULL) {
         clnt_pcreateerror(server);
         exit(1);
     }
@@ -48,7 +47,7 @@ int main(int argc, char** argv)
         fprintf (stderr, "can't zero timeout\n");
         exit(1);
     }
-    if ((result = readdir_1(&(argv[i]), cl)) == NULL) {
+    if ((result = getresult_1(&(argv[i]), cl)) == NULL) {
         clnt_perror(cl, server);
         exit(1);
     }
@@ -56,13 +55,50 @@ int main(int argc, char** argv)
     /* Fehler auswerten. */
     if (result->remoteErrno != 0) {
         errno = result->remoteErrno;
-        perror(dir);
         exit(1);
     }
     
     /* Ergebnis ausgeben. */
-    for (nl = result->readdir_res_u.list; nl != NULL; nl = nl->pNext) {
-        printf("%s\n", nl->name);
+    printf(" _____________________________________________________________________________\n");
+    printf("|\t\t\t\t\t|\n");
+    printf("|    Ergebnisliste der noch nicht abgerufenen CheckIP() aufrufe.\t\t|\n");
+    printf("|\t\t\t\t\t|\n");
+    printf("| überprüfte IP\t| Ergebnis\t\t\t|\n");
+    for (nl = result->checkIP_res_u.list; nl != NULL; nl = nl->pNext) {
+    printf("| %s\t| ", nl->name);
+    switch (nl->result) {
+            case 0:
+                    printf("IP-Adresse ist gültig und befindet sich im Subnetz des Hosts");
+                    break;
+
+            case 1:
+                    printf("Die Subnetzmaske ist ungülitg");
+                    break;
+
+            case 2:
+                    printf("IP-Adresse ist ungültig");
+                    break;
+
+            case 3:
+                    printf("IP-Adresse und Subnetzmaske sind ungültig");
+                    break;
+
+            case 4:
+                    printf("IP-Adresse befindet sich nicht im Subnetz des Hosts");
+                    break;
+
+            case 5:
+                    printf("IP-Adresse ist die Broadcastadresse des Subnetzes");
+                    break;
+
+            case 6:
+                    printf("IP-Adresse ist die Routeradresse des Subnetzes");
+                    break;
+
+            default:
+                    printf("Ungültige Antwort vom Server!");
+    }
+    printf("\t|\n");
     }
     exit(0);
 }
