@@ -1,27 +1,9 @@
 /*
- * one_way.x: no-reply remote multiple directory listing protocol
+ * ipcheck_one_way.x: no-reply remote multiple directory listing protocol
  */
 const           MAXNAMELEN = 255;
 typedef string  nametype < MAXNAMELEN >;        /* a directory entry */
-typedef struct  namenode *namelist;      	/* a link in the listing */
-
-/*
- * a node in the directory
- */
-struct namenode {
-  nametype        name;         /* name of directory entry */
-  namelist        pNext;        /* next entry */
-};
-
-/*
- * the result of a READDIR operation
- */
-union readdir_res switch (int remoteErrno) {
-  case 0:
-  namelist list;                /* no error: return directory listing */
-default:
-  void;                         /* error occurred: nothing else to return */
-};
+typedef struct  resultnode *namelist;      	/* a link in the listing */
 
 /*
  * The directory program definition, two procedures, one expects nothing, the
@@ -29,7 +11,7 @@ default:
  */
 program         DIRPROG {
   version DIRVERS {
-    void        DIRNAME(nametype) = 1;
-    readdir_res READDIR()         = 2;
+    void        checkIP(nametype) = 1;
+    int         getResult()       = 2;
   } =   1;
 } =             0x20000002;
