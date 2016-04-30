@@ -68,17 +68,17 @@ void reset_result_list(char* req_clnt_addr) {
  * Suchen der Ergebnisliste fuer
  * einen durch req_clnt_addr gegebenen Client.
  */
-int find_result_for_client (char* req_clnt_addr) {
+int* find_result_for_client (char* req_clnt_addr) {
     resnode* cursor =  global_results;
     while (cursor != NULL) {
         if (strcmp(cursor->requesting_clnt_addr, req_clnt_addr) == 0) {
             printf("Matching entry found for %s\n", req_clnt_addr);
-            return cursor->checkIP_result;
+            return &(cursor->checkIP_result);
         }
         cursor = cursor->pNext;
     }
     printf("No matching entry found for %s\n", req_clnt_addr);
-    return -1;
+    return NULL;
 }
 
 /*
@@ -98,7 +98,7 @@ void enter_result_for_client(int res, char* req_clnt_addr) {
 }
 
 /* Schnittstelle um IPs zu überprüfen */
-void CHECKIP_svc(nametype* ipadress, struct svc_req *request) {
+void* checkip_1_svc(nametype* ipadress, struct svc_req *request) {
     /*
      * Ggf. Ergebnisse von letztem Client zurueck setzen.
      */
@@ -112,10 +112,12 @@ void CHECKIP_svc(nametype* ipadress, struct svc_req *request) {
 
 	/* Ergebnis in Liste eintragen */
     enter_result_for_client (res, req_addr);
+
+	return (NULL);
 }
 
 /* Schnittstelle um Ergebnisse abzurufen */
-int GETRESULT_svc(void * dummy, struct svc_req *request) {
+int* getresult_1_svc(void * dummy, struct svc_req *request) {
     /* Adresse des anfragenden Clients bestimmen */
     char* req_addr = inet_ntoa(request->rq_xprt->xp_raddr.sin_addr);
 
@@ -123,12 +125,12 @@ int GETRESULT_svc(void * dummy, struct svc_req *request) {
     reset_result_list(reset_client_addr);
 
     /* Ergebnis suchen */
-    int res = find_result_for_client(req_addr);
+    int* res = find_result_for_client(req_addr);
 
     /* Ergebnisse gelesen -> fuer Loeschung vorsehen */
     reset_client_addr = req_addr;
 
-    return (res);
+    return res;
 }
 
 /*****************************************************************
