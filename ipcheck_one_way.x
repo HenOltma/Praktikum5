@@ -1,16 +1,17 @@
 /*
- * ipcheck_one_way.x: no-reply remote multiple directory listing protocol
+ * ipcheck_one_way.x: no-reply remote multiple ip-check protocol
  */
+const           MAXLEN = 19;
 const           MAXNAMELEN = 255;
 typedef string  nametype < MAXNAMELEN >;        /* a directory entry */
 
 /*
- * The directory program definition, two procedures, one expects nothing, the
+ * The IP-Check program definition, two procedures, one expects nothing, the
  * other retrieves any results.
  */
-program         DIRPROG {
-  version DIRVERS {
-    void        checkIP(nametype) = 1;
-    int         getResult()       = 2;
+program         CHECK_IP {
+  version CHECK_IP_1 {
+    void        CHECKIP(ip_str) = 1;
+    checkIP_res	GETRESULT()       = 2;
   } =   1;
 } =             0x20000002;

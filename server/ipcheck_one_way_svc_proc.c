@@ -98,7 +98,7 @@ void enter_result_for_client(int res, char* req_clnt_addr) {
 }
 
 /* Schnittstelle um IPs zu überprüfen */
-void checkIP_svc(nametype* ipadress, struct svc_req *request) {
+void CHECKIP_svc(nametype* ipadress, struct svc_req *request) {
     /*
      * Ggf. Ergebnisse von letztem Client zurueck setzen.
      */
@@ -115,7 +115,7 @@ void checkIP_svc(nametype* ipadress, struct svc_req *request) {
 }
 
 /* Schnittstelle um Ergebnisse abzurufen */
-int getResult_svc(void * dummy, struct svc_req *request) {
+int GETRESULT_svc(void * dummy, struct svc_req *request) {
     /* Adresse des anfragenden Clients bestimmen */
     char* req_addr = inet_ntoa(request->rq_xprt->xp_raddr.sin_addr);
 
@@ -218,7 +218,6 @@ int parseIPv4(char* address, unsigned int* clientIP, uint32_t* subnetmask){
         int ipv4[4] = {0,0,0,0};
         int maske[4] = {0,0,0,0};
         int returnValue;
-        uint32_t broadcastAddress;
         //cuts the IPv4/Prefix into Parts.
         ip = strtok(address,"/");
 	prefix = strtok(NULL,"");

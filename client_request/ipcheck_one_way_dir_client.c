@@ -15,44 +15,52 @@
 extern int errno;
 struct timeval TIMEOUT = {0, 0}; /* used by one_way_clnt.c with clnt_call() timeouts */
 
+/*
+ * ruft die Funktion checkIP() auf dem Server auf.
+ * @param {nametype} Die IP-Adresse
+ */
+void checkIP(char *host, ip_str *ip){
+    	CLIENT  *clnt;
+	int     *result_1;
+	ip_str  ip_adress = *ip;
+
+        printf("%s\n", ip_adress);
+	printf("Erstelle Client...\n");
+
+	clnt = clnt_create (host, CHECK_IP, CHECK_IP_1, "tcp");
+	if (clnt == NULL) {
+		clnt_pcreateerror (host);
+		exit (1);
+	}
+
+	printf("Client erfolgreich erstellt!\n");
+	printf("Stelle Anfrage an Server...\n");
+
+	result_1 = checkip_1(&ip_adress, clnt);
+	if (result_1 == (int *) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
+
+	printf("Anfrage erfolgreich!");
+}
+/*
+ * main function - kontrolliert ob 2 Argumente übergeben wurden und ruft checkIP() auf.
+ */
 int main(int argc, char** argv)
 {
-    CLIENT *cl;
-    char *server;
-    char *dir;
-    readdir_res *result;
-    namelist nl;
-    int i;
+    char *host;
+    int result;
+    ip_str ip_adress = argv[2];
+
+    printf("Anzahl der Argumente: %d\n", argc);
 
     if (argc < 3) {
-        fprintf(stderr, "Usage: %s host directory(s)\n", argv[0]);
-        exit(1);
+            printf ("usage: %s: <client ip> <zu überprüfende adresse>\n", argv[0]);
+            exit (1);
     }
-    server = argv[1];
-
-    /* 
-     * Erzeugung eines Client Handles. 
-     * Fuer asynchrone One-way-Aufrufe wird hier TCP eingestellt, 
-     * damit der Aufruf in jedem Fall den Server erreicht.
-     */
-    if ((cl = clnt_create(server, DIRPROG, DIRVERS, "tcp")) == NULL) {
-        clnt_pcreateerror(server);
-        exit(1);
-    }
-    /*
-     * Fuer alle Argumente der Kommandozeile wird die Server-Funktion 
-     * aufgerufen. Der Timeout wird auf 0 gesetzt, auf die Antwort 
-     * muss (und sollte) nicht gewartet werden.
-     */
-    TIMEOUT.tv_sec = TIMEOUT.tv_usec = 0;
-    if (clnt_control(cl, CLSET_TIMEOUT, (char*) &TIMEOUT) == FALSE) {
-        fprintf (stderr, "can't zero timeout\n");
-        exit(1);
-    }
-    for (i = 2; i < argc; i++) {
-        fprintf (stdout, "Calling rls for '%s'\n", argv[i]);        
-        dirname_1(&(argv[i]), cl);
-        clnt_perror(cl, server); /* ignore the time-out errors */
-    }
-    exit(0);
+    host = argv[1];
+    printf("host: %s\n", host);
+    printf("ip: %s\n", ip_adress);
+    checkIP (host, &ip_adress);
+    exit (0);
 }
