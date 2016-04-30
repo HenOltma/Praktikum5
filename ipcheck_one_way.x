@@ -11,7 +11,7 @@ typedef string  nametype < MAXNAMELEN >;        /* a directory entry */
  */
 program         CHECK_IP {
   version CHECK_IP_1 {
-    void        CHECKIP(ip_str) = 1;
-    checkIP_res	GETRESULT()       = 2;
+    void        CHECKIP(nametype) = 1;
+    int      	GETRESULT()       = 2;
   } =   1;
 } =             0x20000002;
