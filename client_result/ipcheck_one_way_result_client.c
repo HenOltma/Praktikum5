@@ -20,8 +20,7 @@ int main(int argc, char** argv)
 {
     CLIENT *cl;
     char *server;
-    checkIP_res *result;
-    resultlist nl;
+    int *result;
     int i;
 
     if (argc != 2) {
@@ -33,6 +32,7 @@ int main(int argc, char** argv)
     /* 
      * Erzeugung eines Client Handles.
      */
+    printf("erzeuge client handle...\n");
     if ((cl = clnt_create(server, CHECK_IP, CHECK_IP_1, "tcp")) == NULL) {
         clnt_pcreateerror(server);
         exit(1);
@@ -42,19 +42,15 @@ int main(int argc, char** argv)
      * Abruf der Ergebnisse vom Server. 
      * Der Timeout wird auf 25s (Default) gesetzt.
      */
+    printf("Setze timeout...\n");
     TIMEOUT.tv_sec = 25;
     if (clnt_control(cl, CLSET_TIMEOUT, (char*) &TIMEOUT) == FALSE) {
         fprintf (stderr, "can't zero timeout\n");
         exit(1);
     }
+    printf("Schicke Anfrage ab...\n");
     if ((result = getresult_1(&(argv[i]), cl)) == NULL) {
         clnt_perror(cl, server);
-        exit(1);
-    }
-    
-    /* Fehler auswerten. */
-    if (result->remoteErrno != 0) {
-        errno = result->remoteErrno;
         exit(1);
     }
     
@@ -64,9 +60,8 @@ int main(int argc, char** argv)
     printf("|    Ergebnisliste der noch nicht abgerufenen CheckIP() aufrufe.\t\t|\n");
     printf("|\t\t\t\t\t|\n");
     printf("| überprüfte IP\t| Ergebnis\t\t\t|\n");
-    for (nl = result->checkIP_res_u.list; nl != NULL; nl = nl->pNext) {
-    printf("| %s\t| ", nl->name);
-    switch (nl->result) {
+//     printf("| %s\t| ", nl->name);
+    switch (*result) {
             case 0:
                     printf("IP-Adresse ist gültig und befindet sich im Subnetz des Hosts");
                     break;
@@ -97,7 +92,7 @@ int main(int argc, char** argv)
 
             default:
                     printf("Ungültige Antwort vom Server!");
-    }
+    
     printf("\t|\n");
     }
     exit(0);

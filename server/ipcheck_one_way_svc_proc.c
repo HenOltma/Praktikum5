@@ -118,6 +118,9 @@ void* checkip_1_svc(nametype* ipadress, struct svc_req *request) {
 
 /* Schnittstelle um Ergebnisse abzurufen */
 int* getresult_1_svc(void * dummy, struct svc_req *request) {
+    
+    printf("Hole Ergebnis...");
+    
     /* Adresse des anfragenden Clients bestimmen */
     char* req_addr = inet_ntoa(request->rq_xprt->xp_raddr.sin_addr);
 
@@ -187,7 +190,7 @@ int validateSubnetmask(int ipv4[4], int maske[4],char* prefix){
             maske[i] = 255;
         }
         for(i = 0; i != prefix_int%8; i++){
-            maske[tmp1] += pow(2, 7-i);
+            // maske[tmp1] += pow(2, 7-i); TODO: hier wieder einkommentieren und irgendwie lösen
         }
         printf("subnetmask = %d.%d.%d.%d is valid.\n",maske[0],maske[1],maske[2],maske[3]);
         return 0;

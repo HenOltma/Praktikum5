@@ -12,7 +12,7 @@ ipcheck_one_way_svc.c ipcheck_one_way_xdr.c ipcheck_one_way.h: ../ipcheck_one_wa
 	$(RM) ipcheck_one_way_clnt.c
 
 $(EXE): $(MAIN).c ipcheck_one_way_svc_proc.c ipcheck_one_way_xdr.c ipcheck_one_way.h
-	gcc ipcheck_one_way_xdr.c ipcheck_one_way_svc_proc.c $(MAIN).c -o -lm $(EXE)
+	gcc -o $(EXE) ipcheck_one_way_svc_proc.c ipcheck_one_way_xdr.c $(MAIN).c
 
 clean:
 	$(RM) $(EXE) $(MAIN).c ipcheck_one_way_xdr.c \

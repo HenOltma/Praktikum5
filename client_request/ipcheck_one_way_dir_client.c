@@ -19,10 +19,10 @@ struct timeval TIMEOUT = {0, 0}; /* used by one_way_clnt.c with clnt_call() time
  * ruft die Funktion checkIP() auf dem Server auf.
  * @param {nametype} Die IP-Adresse
  */
-void checkIP(char *host, ip_str *ip){
+void checkIP(char *host, nametype *ip){
     	CLIENT  *clnt;
 	int     *result_1;
-	ip_str  ip_adress = *ip;
+	nametype  ip_adress = *ip;
 
         printf("%s\n", ip_adress);
 	printf("Erstelle Client...\n");
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 {
     char *host;
     int result;
-    ip_str ip_adress = argv[2];
+    nametype ip_adress = argv[2];
 
     printf("Anzahl der Argumente: %d\n", argc);
 
