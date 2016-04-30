@@ -3,7 +3,6 @@
  */
 const           MAXNAMELEN = 255;
 typedef string  nametype < MAXNAMELEN >;        /* a directory entry */
-typedef struct  resultnode *namelist;      	/* a link in the listing */
 
 /*
  * The directory program definition, two procedures, one expects nothing, the
