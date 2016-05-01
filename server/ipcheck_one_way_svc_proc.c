@@ -1,14 +1,3 @@
-/**************************************************************
- * rls_one_way_svc_proc.c
- * Implementierung der Funktionen zum Auslesen von Directories.
- * Die erste Funktion (dirname_1_svc) kann asynchnron aufgerufen werden.
- * Die zweite Funktion (readdir_1_svc) kann nur synchron aufgerufen werden.
- * Heinz-Josef Eikerling, HS OS
- * 16.06.2012: Fertigstellung
- * 01.05.2014: Korrektur beim Zurücksetzen der Ergebnisliste.
- * To Do:
- * - Ggf. Struktur mit Listen fuer jedes Verzeichnis erzeugen.
- **************************************************************/
 
 #include <rpc/rpc.h>
 #include <netinet/in.h>
@@ -25,9 +14,9 @@ int parseIPv4(char* address, unsigned int* clientIP, uint32_t* subnetmask);
 /* Struktur zur Speicherung von Directory-Listings pro Client! */
 typedef struct resnode* readdir_reslist;
 struct resnode {
-	char* requesting_clnt_addr;
+    char* requesting_clnt_addr;
     int checkIP_result;
-	readdir_reslist pNext;
+    readdir_reslist pNext;
 };
 typedef struct resnode resnode;
 
@@ -107,13 +96,13 @@ void* checkip_1_svc(nametype* ipadress, struct svc_req *request) {
     /* Adresse des anfragenden Clients bestimmen */
     char* req_addr = inet_ntoa(request->rq_xprt->xp_raddr.sin_addr);
 
-	/* IP-Adresse validieren */
+    /* IP-Adresse validieren */
     int res = validateIP(ipadress, request);
-
-	/* Ergebnis in Liste eintragen */
+    
+    /* Ergebnis in Liste eintragen */
     enter_result_for_client (res, req_addr);
 
-	return (NULL);
+    return (NULL);
 }
 
 /* Schnittstelle um Ergebnisse abzurufen */
@@ -150,10 +139,11 @@ int validateIP(nametype *argp, struct svc_req *rqstp) {
         printf("\n\nGot Client request:\t'Is %s in the server subnet?'\n\n", *argp);
         result = parseIPv4(*argp, &clientIP, &subnetmask);
         serverIP = rqstp->rq_xprt->xp_raddr.sin_addr.s_addr;
-		printf("server IP: %s\n",inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr));
         struct in_addr netIP;
         netIP.s_addr = clientIP & subnetmask;
         printf("net IP: %s\n",inet_ntoa(netIP));
+        printf("server IP: %s\n",inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr));
+        
         if(result == 0){
             if(clientIP == serverIP){
                 printf("same server/client address");
