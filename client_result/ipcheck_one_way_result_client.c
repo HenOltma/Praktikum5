@@ -48,6 +48,17 @@ int main(int argc, char** argv)
         fprintf (stderr, "can't zero timeout\n");
         exit(1);
     }
+    
+    /*
+     * Abruf der Ergebnisse vom Server. 
+     * Der Timeout wird auf 25s (Default) gesetzt.
+    */
+    TIMEOUT.tv_sec = 25;
+    if (clnt_control(clnt, CLSET_TIMEOUT, (char*) &TIMEOUT) == FALSE) {
+       fprintf (stderr, "can't zero timeout\n");
+       exit(1);
+    }
+        
     printf("Schicke Anfrage ab...\n");
     if ((result = getresult_1(&(argv[i]), cl)) == NULL) {
         clnt_perror(cl, server);

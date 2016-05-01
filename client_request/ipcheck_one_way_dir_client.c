@@ -36,6 +36,16 @@ void checkIP(char *host, nametype *ip){
 	printf("Client erfolgreich erstellt!\n");
 	printf("Stelle Anfrage an Server...\n");
 
+        /*
+         * Abruf der Ergebnisse vom Server. 
+        * Der Timeout wird auf 25s (Default) gesetzt.
+        */
+        TIMEOUT.tv_sec = 25;
+        if (clnt_control(clnt, CLSET_TIMEOUT, (char*) &TIMEOUT) == FALSE) {
+            fprintf (stderr, "can't zero timeout\n");
+            exit(1);
+        }
+            
 	result_1 = checkip_1(&ip_adress, clnt);
 	if (result_1 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
