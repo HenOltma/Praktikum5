@@ -54,7 +54,7 @@ int main(int argc, char** argv)
      * Der Timeout wird auf 25s (Default) gesetzt.
     */
     TIMEOUT.tv_sec = 25;
-    if (clnt_control(clnt, CLSET_TIMEOUT, (char*) &TIMEOUT) == FALSE) {
+    if (clnt_control(cl, CLSET_TIMEOUT, (char*) &TIMEOUT) == FALSE) {
        fprintf (stderr, "can't zero timeout\n");
        exit(1);
     }
@@ -66,11 +66,7 @@ int main(int argc, char** argv)
     }
     
     /* Ergebnis ausgeben. */
-    printf(" _____________________________________________________________________________\n");
-    printf("|\t\t\t\t\t|\n");
-    printf("|    Ergebnisliste der noch nicht abgerufenen CheckIP() aufrufe.\t\t|\n");
-    printf("|\t\t\t\t\t|\n");
-    printf("| überprüfte IP\t| Ergebnis\t\t\t|\n");
+    printf("Ergebnis:\n");
 //     printf("| %s\t| ", nl->name);
     switch (*result) {
             case 0:
@@ -99,6 +95,10 @@ int main(int argc, char** argv)
 
             case 6:
                     printf("IP-Adresse ist die Routeradresse des Subnetzes");
+                    break;
+
+            case -1:
+                    printf("Kein Eintrag zur IP-Adresse gefunden");
                     break;
 
             default:

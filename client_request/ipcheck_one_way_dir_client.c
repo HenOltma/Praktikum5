@@ -40,11 +40,11 @@ void checkIP(char *host, nametype *ip){
          * Abruf der Ergebnisse vom Server. 
         * Der Timeout wird auf 25s (Default) gesetzt.
         */
-        TIMEOUT.tv_sec = 25;
-        if (clnt_control(clnt, CLSET_TIMEOUT, (char*) &TIMEOUT) == FALSE) {
-            fprintf (stderr, "can't zero timeout\n");
-            exit(1);
-        }
+        // TIMEOUT.tv_sec = 25;
+        // if (clnt_control(clnt, CLSET_TIMEOUT, (char*) &TIMEOUT) == FALSE) {
+        //     fprintf (stderr, "can't zero timeout\n");
+        //     exit(1);
+        // }
             
 	result_1 = checkip_1(&ip_adress, clnt);
 	if (result_1 == (int *) NULL) {

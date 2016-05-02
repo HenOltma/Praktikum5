@@ -23,6 +23,9 @@ typedef struct resnode resnode;
 /* Ergebnisliste:  muss statisch sein! */
 static readdir_reslist global_results = NULL;
 
+/* Fehlermeldung: Ergebnis für IP-Adresse nicht gefunden */
+int err = -1;
+
 /* IP-Adresse des letzten Clients, für den das Ergebnis geloescht werden soll */
 static char* reset_client_addr = NULL;
 
@@ -108,7 +111,7 @@ void* checkip_1_svc(nametype* ipadress, struct svc_req *request) {
 /* Schnittstelle um Ergebnisse abzurufen */
 int* getresult_1_svc(void * dummy, struct svc_req *request) {
     
-    printf("Hole Ergebnis...");
+    printf("Hole Ergebnis...\n");
     
     /* Adresse des anfragenden Clients bestimmen */
     char* req_addr = inet_ntoa(request->rq_xprt->xp_raddr.sin_addr);
@@ -119,14 +122,42 @@ int* getresult_1_svc(void * dummy, struct svc_req *request) {
     /* Ergebnis suchen */
     int* res = find_result_for_client(req_addr);
 
+    if (res == NULL) {
+        printf("Gebe \"Kein Eintrag gefunden\" zurück\n");
+        return &err;
+    }
+
     /* Ergebnisse gelesen -> fuer Loeschung vorsehen */
     reset_client_addr = req_addr;
 
     return res;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*****************************************************************
-				Aus letztem Praktikum übernommen
+				
+                
+                
+                Aus letztem Praktikum übernommen
+                
+                
+                
 ******************************************************************/
 
 int validateIP(nametype *argp, struct svc_req *rqstp) {
@@ -163,6 +194,20 @@ int validateIP(nametype *argp, struct svc_req *rqstp) {
         }
         return result;
 }
+
+float powpow(float base, float ex){
+    if (ex == 0){
+        return 1;
+    }else if( ex < 0){
+        return 1 / powpow(base, -ex);
+    }else if ((int)ex % 2 == 0){
+        float half_pow = powpow(base, ex/2);
+        return half_pow * half_pow;
+    }else{
+        return base * powpow(base, ex - 1);
+    }
+}
+
 // Validates Subnetmask. returns 0 on success. 1 on failure.
 int validateSubnetmask(int ipv4[4], int maske[4],char* prefix){
         if(prefix == NULL){
@@ -180,7 +225,7 @@ int validateSubnetmask(int ipv4[4], int maske[4],char* prefix){
             maske[i] = 255;
         }
         for(i = 0; i != prefix_int%8; i++){
-            // maske[tmp1] += pow(2, 7-i); TODO: hier wieder einkommentieren und irgendwie lösen
+            maske[tmp1] += powpow(2, 7-i);
         }
         printf("subnetmask = %d.%d.%d.%d is valid.\n",maske[0],maske[1],maske[2],maske[3]);
         return 0;
