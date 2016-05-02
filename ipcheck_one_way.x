@@ -7,7 +7,7 @@ const MAXLEN = 19;
 
 
 typedef string ip_str<MAXLEN>;			/* string für ip adresse */
-typedef struct  resultnode *resultlist;      	/* a link in the listing */
+typedef struct  resultnode* resultlist;      	/* a link in the listing */
 
 
 /*

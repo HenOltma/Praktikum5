@@ -53,8 +53,8 @@ int main(int argc, char** argv)
     }
     
     /* Fehler auswerten. */
-    if (result->remoteErrno != 0) {
-        errno = result->remoteErrno;
+    if (result->checkIP_res_u.list == NULL) {
+        printf("Kein Ergebnis gefunden!\n");
         exit(1);
     }
     

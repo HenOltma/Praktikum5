@@ -4,7 +4,7 @@
 #include <math.h>
 #include "ipcheck_one_way.h"
 
-int validateIP(nametype *argp, struct svc_req *rqstp);
+int validateIP(ip_str *argp, struct svc_req *rqstp);
 int validateSubnetmask(int ipv4[4], int maske[4],char* prefix);
 int validateIPv4Address(char* address, int ipv4[4]);
 int parseIPv4(char* address, unsigned int* clientIP, uint32_t* subnetmask);
@@ -21,6 +21,8 @@ typedef struct resnode resnode;
 
 /* Ergebnisliste:  muss statisch sein! */
 static ipcheck_reslist global_results = NULL;
+
+static checkIP_res DefaultResult;
 
 /* IP-Adresse des letzten Clients, für den das Ergebnis geloescht werden soll */
 static char* reset_client_addr = NULL;
@@ -56,12 +58,12 @@ void reset_result_list(char* req_clnt_addr) {
  * Suchen der Ergebnisliste fuer
  * einen durch req_clnt_addr gegebenen Client.
  */
-int* find_result_for_client (char* req_clnt_addr) {
+checkIP_res* find_result_for_client (char* req_clnt_addr) {
     resnode* cursor =  global_results;
     while (cursor != NULL) {
         if (strcmp(cursor->requesting_clnt_addr, req_clnt_addr) == 0) {
             printf("Matching entry found for %s\n", req_clnt_addr);
-            return &(cursor->results);
+            return cursor->results;
         }
         cursor = cursor->pNext;
     }
@@ -73,12 +75,12 @@ int* find_result_for_client (char* req_clnt_addr) {
  * Neue Ergebnisliste res fuer
  * einen durch req_clnt_addr gegebenen Client eintragen.
  */
-void enter_result_for_client(int res, char* req_clnt_addr) {
+void enter_result_for_client(checkIP_res* res, char* req_clnt_addr) {
     printf("Entering result list for %s\n", req_clnt_addr);
 
     resnode* new_res_node = (resnode *) malloc(sizeof (resnode));
     new_res_node->requesting_clnt_addr = strdup(req_clnt_addr);
-    new_res_node->checkIP_result = res;
+    new_res_node->results = res;
     /* Einfuegen am Anfang der Liste */
     new_res_node->pNext = global_results;
     global_results = new_res_node;
@@ -86,7 +88,11 @@ void enter_result_for_client(int res, char* req_clnt_addr) {
 }
 
 /* Schnittstelle um IPs zu überprüfen */
-void* checkip_1_svc(nametype* ipadress, struct svc_req *request) {
+void* checkip_1_svc(ip_str* ipadress, struct svc_req *request) {
+    
+    resultlist nl;
+    resultlist* nlp;
+    
     /*
      * Ggf. Ergebnisse von letztem Client zurueck setzen.
      */
@@ -94,18 +100,38 @@ void* checkip_1_svc(nametype* ipadress, struct svc_req *request) {
 
     /* Adresse des anfragenden Clients bestimmen */
     char* req_addr = inet_ntoa(request->rq_xprt->xp_raddr.sin_addr);
+    
+    checkIP_res* res = find_result_for_client (req_addr);
+    
+    if (res == NULL) {
+        /* neue Liste anlegen */
+        res = (checkIP_res*) malloc (sizeof(checkIP_res));
+        /* Das ist wichtig hier! Bei einer statischen Variable nicht!*/
+        res->checkIP_res_u.list = NULL;
+        enter_result_for_client (res, req_addr);
+    }
+    
+     /* An das Ende Result-Liste gehen. */
+    nlp = &(res->checkIP_res_u.list);
+    while ((nl = *nlp) != NULL)
+        nlp = &(nl->pNext);
+    
+    nl = (resultnode *) malloc(sizeof (resultnode));
+    *nlp = nl;
+    nl->name = strdup(*ipadress);
+    /* IP-Adresse validieren */
+    nl->result = validateIP(ipadress, request);
+    nlp = &(nl->pNext);
+    
+    *nlp = NULL;
+    
+    res->remoteErrno = 0;
 
-	/* IP-Adresse validieren */
-    int res = validateIP(ipadress, request);
-
-	/* Ergebnis in Liste eintragen */
-    enter_result_for_client (res, req_addr);
-
-	return (NULL);
+    return (NULL);
 }
 
 /* Schnittstelle um Ergebnisse abzurufen */
-int* getresult_1_svc(void * dummy, struct svc_req *request) {
+checkIP_res* getresult_1_svc(void * dummy, struct svc_req *request) {
     
     printf("Hole Ergebnis...");
     
@@ -116,11 +142,17 @@ int* getresult_1_svc(void * dummy, struct svc_req *request) {
     reset_result_list(reset_client_addr);
 
     /* Ergebnis suchen */
-    int* res = find_result_for_client(req_addr);
-
-    /* Ergebnisse gelesen -> fuer Loeschung vorsehen */
+    checkIP_res* res = find_result_for_client(req_addr);
+    
+    printf("Fehlerüberprüfung...");
     reset_client_addr = req_addr;
-
+     if (res == NULL) {
+        res = &DefaultResult; 
+        reset_client_addr = "";
+    } else {
+        /* Ergebnisse gelesen -> fuer Loeschung vorsehen */
+        reset_client_addr = req_addr;
+    }
     return res;
 }
 
@@ -128,7 +160,7 @@ int* getresult_1_svc(void * dummy, struct svc_req *request) {
 				Aus letztem Praktikum übernommen
 ******************************************************************/
 
-int validateIP(nametype *argp, struct svc_req *rqstp) {
+int validateIP(ip_str *argp, struct svc_req *rqstp) {
 	static int  result;
         uint32_t clientIP;
         uint32_t serverIP;
